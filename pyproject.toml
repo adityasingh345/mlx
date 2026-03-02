@@ -1,0 +1,18 @@
+[project]
+name = "mlx-cli"
+version = "0.1.0"
+description = "ML Experiment Manager CLI tool"
+authors = [{ name="Aditya Kumar Singh" }]
+dependencies = [
+    "typer",
+    "rich",
+    "sqlalchemy",
+    "pydantic"
+]
+
+[project.scripts]
+mlx = "mlx.cli:app"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
