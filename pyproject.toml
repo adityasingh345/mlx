@@ -1,18 +1,41 @@
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "mlx-cli"
+name = "mlx"
 version = "0.1.0"
-description = "ML Experiment Manager CLI tool"
-authors = [{ name="Aditya Kumar Singh" }]
+description = "Local ML experiment tracker for engineers who live in the terminal"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+authors = [
+  { name = "Aditya_Kimar_Singh", email = "singhadityakumar546@gmail.com" }
+]
+keywords = ["machine-learning", "experiment-tracking", "cli", "mlops"]
+
 dependencies = [
-    "typer",
-    "rich",
-    "sqlalchemy",
-    "pydantic"
+    "typer[all]>=0.12",
+    "rich>=13",
+    "sqlmodel>=0.0.16",
+    "toml>=0.10",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7",
+    "pytest-cov",
+    "ruff",
 ]
 
 [project.scripts]
 mlx = "mlx.cli:app"
 
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "I"]
+ignore = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
