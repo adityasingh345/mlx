@@ -1,0 +1,1 @@
+# Storage layer — SQLite DB and filesystem helpers
