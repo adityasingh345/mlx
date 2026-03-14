@@ -12,7 +12,7 @@ from rich.console import Console
 from mlx import __version__
 
 app = typer.Typer(
-    help="🧪 [bold cyan]MLX[/bold cyan] — Local ML Experiment Manager.\n\n"
+    help="[bold cyan]MLX[/bold cyan] — Local ML Experiment Manager.\n\n"
          "Track experiments, runs, params and metrics. 100% local. No server needed.",
     no_args_is_help=True,       # Show help when user types just `mlx`
     rich_markup_mode="rich",    # Allow [bold], [cyan] etc in help text
@@ -21,16 +21,15 @@ app = typer.Typer(
 
 console = Console()
 
-@app.callback()
-def main():
-    """
-    🚀 MLX CLI
-    """
-    pass
+from mlx.commands.init import init 
+from mlx.commands import run as run_cmd 
+
+from mlx.commands.init import init
+app.command("init", help="Initialize a new mlx project")(init)
+app.add_typer(run_cmd.app,  name="run",  help="Manage experiment runs")
 
 @app.command("version")
 def version():
-    """Show the mlx version and exit."""
     console.print(f"mlx [bold cyan]v{__version__}[/bold cyan]")
     
 if __name__ == "__main__":
