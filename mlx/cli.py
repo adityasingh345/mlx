@@ -24,11 +24,16 @@ console = Console()
 from mlx.commands.init import init 
 from mlx.commands import run as run_cmd 
 from mlx.commands import log as log_cmd 
+from mlx.commands import ls as ls_cmd 
+from mlx.commands import status as status_cmd  
+
 
 from mlx.commands.init import init
 app.command("init", help="Initialize a new mlx project")(init)
 app.add_typer(run_cmd.app,  name="run",  help="Manage experiment runs")
 app.add_typer(log_cmd.app, name="log", help="Log Metric, params and notes")
+app.add_typer(ls_cmd.app , name="ls", help="list all runs")
+app.add_typer(status_cmd.app, name="status", help="show the active run")
 
 
 @app.command("version")
