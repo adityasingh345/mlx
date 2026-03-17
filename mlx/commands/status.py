@@ -1,223 +1,124 @@
 """
-mlx/commands/ls.py
+mlx/commands/status.py
 
-The `mlx ls` command — shortcut for listing all runs.
+The `mlx status` command.
+Shortcut for `mlx run status` — shows the active run.
 
-Supports filtering and sorting so you can quickly
-find the run you're looking for.
+This is the command you run when you want to quickly
+check what's currently being tracked.
 
 Usage:
-    mlx ls
-    mlx ls --experiment fraud-detection
-    mlx ls --status done
-    mlx ls --limit 5
-    mlx ls --all
+    mlx status
+    mlx status --run-id "catboost-v1_20240301_143201"
+    mlx status --logs
 """
 
 import typer
 from rich.console import Console
-from rich.text import Text
+from rich.panel import Panel
 
 from mlx.core.run import RunManager
 from mlx.core.metrics import MetricManager
-from mlx.utils.display import runs_table, info, warn
+from mlx.core.params import ParamManager
+from mlx.storage.filesystem import read_logs, get_active_run
+from mlx.utils.display import info, error, run_detail_panel
 
-app = typer.Typer(help="List all runs. Shortcut for `mlx run list`.")
+app = typer.Typer(help="Show the active run. Shortcut for `mlx run status`.")
 console = Console()
 
 
 @app.callback(invoke_without_command=True)
-def ls(
-    experiment: str = typer.Option(
+def status(
+    run_id: str = typer.Option(
         None,
-        "--experiment", "-e",
-        help="Filter by experiment name"
+        "--run-id",
+        help="Specific run ID (default: active run)"
     ),
-    status: str = typer.Option(
-        None,
-        "--status", "-s",
-        help="Filter by status: running, done, failed"
-    ),
-    limit: int = typer.Option(
-        20,
-        "--limit", "-l",
-        help="Max runs to show (default 20)"
-    ),
-    show_all: bool = typer.Option(
+    logs: bool = typer.Option(
         False,
-        "--all", "-a",
-        help="Show all runs ignoring limit"
-    ),
-    metrics: bool = typer.Option(
-        False,
-        "--metrics", "-m",
-        help="Show latest metric values in the table"
+        "--logs", "-l",
+        help="Also show last 20 lines of the run log"
     ),
 ):
     """
-    List all runs in a clean table.
+    Show the active run's details — params, metrics, timing.
 
-    Shows run ID, name, experiment, status, tags,
-    created time and duration at a glance.
+    If no run is active, tells you how to start one.
+    Use --run-id to inspect any past run by ID.
 
     Examples:
-        mlx ls
-        mlx ls --experiment fraud-detection
-        mlx ls --status done
-        mlx ls --limit 5
-        mlx ls --all
-        mlx ls --metrics
+        mlx status
+        mlx status --run-id "catboost-v1_20240301_143201"
+        mlx status --logs
     """
 
-    # --all overrides --limit
-    actual_limit = 999999 if show_all else limit
-
-    # Fetch runs with filters
-    runs = RunManager.get_all(
-        experiment=experiment,
-        status=status,
-        limit=actual_limit,
-    )
-
-    # ── Empty state ────────────────────────────
-    if not runs:
-        console.print()
-
-        if experiment or status:
-            # Filters returned nothing
-            warn("No runs found matching your filters.")
-            console.print()
-            if experiment:
-                console.print(f"  [dim]experiment:[/dim] {experiment}")
-            if status:
-                console.print(f"  [dim]status    :[/dim] {status}")
+    # ── Find which run to show ─────────────────
+    if run_id:
+        # Specific run requested
+        run = RunManager.get(run_id)
+        if not run:
+            error(f"Run not found: [bold]{run_id}[/bold]")
             console.print()
             console.print(
-                "  Try [cyan]mlx ls[/cyan] without filters "
-                "to see all runs."
+                "  Check your run IDs with: "
+                "[cyan]mlx ls[/cyan]"
             )
-        else:
-            # No runs at all yet
-            info("No runs yet.")
-            console.print()
-            console.print(
-                "  Start your first run: "
-                "[cyan]mlx run start --name 'my-run'[/cyan]"
-            )
-
-        console.print()
-        return
-
-    # ── Build and print table ──────────────────
-    console.print()
-
-    if metrics:
-        # Enhanced table with metric columns
-        _print_table_with_metrics(runs)
+            raise typer.Exit(1)
     else:
-        # Standard table
-        console.print(runs_table(runs))
+        # Show active run
+        run = RunManager.get_active()
 
-    # ── Footer summary ─────────────────────────
-    _print_summary(runs, limit, show_all, actual_limit)
+        if not run:
+            # No active run — show helpful message
+            console.print()
+            info("No active run right now.")
+            console.print()
 
+            # Show the most recent run as a suggestion
+            recent = RunManager.get_all(limit=1)
+            if recent:
+                console.print(
+                    f"  [dim]Last run:[/dim]  "
+                    f"[white]{recent[0].run_id}[/white]  "
+                    f"[dim]({recent[0].status})[/dim]"
+                )
+                console.print(
+                    f"\n  To inspect it:  "
+                    f"[cyan]mlx status --run-id "
+                    f"\"{recent[0].run_id}\"[/cyan]"
+                )
+            else:
+                console.print(
+                    "  Start a run with: "
+                    "[cyan]mlx run start --name 'my-run'[/cyan]"
+                )
 
-def _print_table_with_metrics(runs: list):
-    """
-    Print runs table with an extra column showing
-    the latest metric values for each run.
+            console.print()
+            raise typer.Exit()
 
-    Collects all unique metric keys across all runs
-    then adds one column per metric.
-    """
-    from rich.table import Table
-    from rich import box
+    # ── Fetch associated data ──────────────────
+    params  = ParamManager.get_for_run(run.run_id)
+    metrics = MetricManager.get_latest(run.run_id)
 
-    # Find all unique metric keys across all runs
-    all_keys = set()
-    metrics_by_run = {}
+    # ── Show the detail panel ──────────────────
+    console.print()
+    run_detail_panel(run, metrics, params)
 
-    for run in runs:
-        m_dict = {
-            m.key: m.value
-            for m in MetricManager.get_latest(run.run_id)
-        }
-        metrics_by_run[run.run_id] = m_dict
-        all_keys.update(m_dict.keys())
+    # ── Optionally show logs ───────────────────
+    if logs:
+        log_lines = read_logs(run.run_id, tail=20)
 
-    # Sort metric keys alphabetically
-    metric_keys = sorted(all_keys)
+        if log_lines:
+            console.print(Panel(
+                "\n".join(
+                    f"[dim]{line}[/dim]"
+                    for line in log_lines
+                ),
+                title="[bold white]Recent Logs[/bold white]",
+                border_style="dim",
+                padding=(1, 2),
+            ))
+        else:
+            info("No log file found for this run.")
 
-    # Build table
-    table = Table(
-        box=box.ROUNDED,
-        border_style="dim",
-        header_style="bold cyan",
-        show_lines=False,
-    )
-
-    # Standard columns
-    table.add_column("Name",       style="bold white")
-    table.add_column("Experiment", style="magenta")
-    table.add_column("Status",     justify="center")
-    table.add_column("Duration",   justify="right", style="yellow")
-
-    # One column per metric
-    for key in metric_keys:
-        table.add_column(key, justify="right", style="green")
-
-    # Add rows
-    for run in runs:
-        status_display = {
-            "running": "[bold yellow]⟳ running[/bold yellow]",
-            "done":    "[bold green]✓ done[/bold green]",
-            "failed":  "[bold red]✗ failed[/bold red]",
-        }.get(run.status, run.status)
-
-        duration = "-"
-        if run.duration_sec is not None:
-            m, s = divmod(int(run.duration_sec), 60)
-            duration = f"{m}m {s}s" if m > 0 else f"{s}s"
-
-        # Base columns
-        row = [
-            run.name,
-            run.experiment,
-            status_display,
-            duration,
-        ]
-
-        # Metric columns — show value or dash if not logged
-        run_metrics = metrics_by_run.get(run.run_id, {})
-        for key in metric_keys:
-            val = run_metrics.get(key)
-            row.append(f"{val:.4f}" if val is not None else "-")
-
-        table.add_row(*row)
-
-    console.print(table)
-
-
-def _print_summary(runs, limit, show_all, actual_limit):
-    """Print a summary line below the table."""
-
-    done_count    = sum(1 for r in runs if r.status == "done")
-    running_count = sum(1 for r in runs if r.status == "running")
-    failed_count  = sum(1 for r in runs if r.status == "failed")
-
-    # Warning if results were cut off by limit
-    limit_note = ""
-    if not show_all and len(runs) == limit:
-        limit_note = (
-            f"  [dim](showing last {limit} — "
-            f"use [cyan]--all[/cyan] to see everything)[/dim]"
-        )
-
-    console.print(
-        f"\n  [dim]{len(runs)} run(s)  ·  "
-        f"[green]{done_count} done[/green]  ·  "
-        f"[yellow]{running_count} running[/yellow]  ·  "
-        f"[red]{failed_count} failed[/red][/dim]"
-        f"{limit_note}"
-    )
     console.print()
