@@ -9,7 +9,7 @@ from sqlmodel import Field, Session, SQLModel, create_engine, select
 class Experiment(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True, unique=True)
-    descriptin: str = ""
+    description: str = ""
     
     created_at: str = Field(default_factory = lambda:datetime.datetime.utcnow().isoformat())
     
