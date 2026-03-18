@@ -344,4 +344,3 @@ def compare(
 
     console.print()
 
-

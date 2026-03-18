@@ -27,6 +27,7 @@ from mlx.commands import log as log_cmd
 from mlx.commands import ls as ls_cmd 
 from mlx.commands import status as status_cmd  
 from mlx.commands import compare as compare_cmd
+from mlx.commands import export as export_cmd
 
 from mlx.commands.init import init
 app.command("init", help="Initialize a new mlx project")(init)
@@ -35,6 +36,7 @@ app.add_typer(log_cmd.app, name="log", help="Log Metric, params and notes")
 app.add_typer(ls_cmd.app , name="ls", help="list all runs")
 app.add_typer(status_cmd.app, name="status", help="show the active run")
 app.add_typer(compare_cmd.app, name="compare", help="comapre runs side by side")
+app.add_typer(export_cmd.app, name="export", help="Export runs to csv or json")
 
 @app.command("version")
 def version():
