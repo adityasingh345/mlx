@@ -8,10 +8,10 @@ The `mlx_project` fixture creates a fresh temporary
 .mlx project before each test and cleans up after.
 """
 
+
 import pytest
 import toml
-import os
-from pathlib import Path
+
 from mlx.storage.db import init_db
 
 

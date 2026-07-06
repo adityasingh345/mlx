@@ -1,6 +1,5 @@
 """Tests for ExperimentManager."""
 
-import pytest
 from mlx.core.experiment import ExperimentManager
 
 

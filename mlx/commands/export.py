@@ -9,17 +9,18 @@ Usage:
     mlx export --status done            → filter by status
 """
 
-import json
 import csv
 import io
-import typer
+import json
 from pathlib import Path
+
+import typer
 from rich.console import Console
 
-from mlx.core.run import RunManager
 from mlx.core.metrics import MetricManager
 from mlx.core.params import ParamManager
-from mlx.utils.display import success, error, info, warn
+from mlx.core.run import RunManager
+from mlx.utils.display import error, success, warn
 
 app = typer.Typer(help="Export runs to CSV or JSON.")
 console = Console()

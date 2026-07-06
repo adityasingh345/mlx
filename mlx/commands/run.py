@@ -3,12 +3,16 @@ import typer
 from rich.console import Console
 from rich.panel import Panel
 
-from mlx.core.run import RunManager
 from mlx.core.metrics import MetricManager
 from mlx.core.params import ParamManager
+from mlx.core.run import RunManager
 from mlx.utils.display import (
-    success, error, info, warn,
-    runs_table, run_detail_panel,
+    error,
+    info,
+    run_detail_panel,
+    runs_table,
+    success,
+    warn,
 )
 
 app = typer.Typer(help="Manage experiment runs.")
@@ -147,7 +151,7 @@ def run_stop(
     ))
 
     console.print("[dim]See your results:[/dim]")
-    console.print(f"  [cyan]mlx ls[/cyan]")
+    console.print("  [cyan]mlx ls[/cyan]")
     console.print()
     
 @app.command("list")

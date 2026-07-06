@@ -11,11 +11,10 @@ Usage:
 
 import typer
 from rich.console import Console
-from rich.text import Text
 
-from mlx.core.run import RunManager
 from mlx.core.metrics import MetricManager
-from mlx.utils.display import runs_table, info, warn
+from mlx.core.run import RunManager
+from mlx.utils.display import info, runs_table, warn
 
 app = typer.Typer(help="List all runs. Shortcut for `mlx run list`.")
 console = Console()
@@ -125,8 +124,8 @@ def _print_table_with_metrics(runs: list):
     Collects all unique metric keys across all runs
     then adds one column per metric.
     """
-    from rich.table import Table
     from rich import box
+    from rich.table import Table
 
     # Find all unique metric keys across all runs
     all_keys = set()

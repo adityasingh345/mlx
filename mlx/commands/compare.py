@@ -2,16 +2,16 @@
 # uasge: mlx compare run-id-1 run-id-2 , mlx compare run-id-1 run-id-2 --params-only 
 
 
-import typer 
+import typer
+from rich import box
 from rich.console import Console
 from rich.table import Table
-from rich.text import Text 
-from rich import box
+from rich.text import Text
 
-from mlx.core.run import RunManager 
 from mlx.core.metrics import MetricManager
 from mlx.core.params import ParamManager
-from mlx.utils.display import error, warn
+from mlx.core.run import RunManager
+from mlx.utils.display import error
 
 app = typer.Typer(help="Compare two or more runs side by side")
 
@@ -320,7 +320,7 @@ def compare(
         if not run:
             error(f"Run not found: [bold]{rid}[/bold]")
             console.print(
-                f"  Check your run IDs with: [cyan]mlx ls[/cyan]"
+                "  Check your run IDs with: [cyan]mlx ls[/cyan]"
             )
             raise typer.Exit(1)
         

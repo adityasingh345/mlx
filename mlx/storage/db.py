@@ -1,8 +1,8 @@
+import datetime
 from pathlib import Path
 from typing import Optional
-import datetime
 
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Field, Session, SQLModel, create_engine
 
 # Table 1 - Experiments 
 

@@ -17,11 +17,11 @@ import typer
 from rich.console import Console
 from rich.panel import Panel
 
-from mlx.core.run import RunManager
 from mlx.core.metrics import MetricManager
 from mlx.core.params import ParamManager
-from mlx.storage.filesystem import read_logs, get_active_run
-from mlx.utils.display import info, error, run_detail_panel
+from mlx.core.run import RunManager
+from mlx.storage.filesystem import read_logs
+from mlx.utils.display import error, info, run_detail_panel
 
 app = typer.Typer(help="Show the active run. Shortcut for `mlx run status`.")
 console = Console()

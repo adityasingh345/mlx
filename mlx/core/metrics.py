@@ -1,8 +1,10 @@
 #handles logging and reading metrices 
 
-from sqlmodel import select 
+from sqlmodel import select
+
 from mlx.storage.db import Metric, get_session
-from mlx.storage.filesystem import get_active_run, append_log
+from mlx.storage.filesystem import append_log, get_active_run
+
 
 class MetricManager:
     @staticmethod

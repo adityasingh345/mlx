@@ -3,8 +3,11 @@ Test for core/metrics.py and core/params.py
 Run with: python test_metrics_params.py
 """
 
-import tempfile, os, toml
+import os
+import tempfile
 from pathlib import Path
+
+import toml
 
 # ── ARRANGE: build fake project ─────────────
 tmp = Path(tempfile.mkdtemp())
@@ -16,11 +19,13 @@ with open(mlx_dir / "config.toml", "w") as f:
     toml.dump({"project": {"name": "test"}}, f)
 
 from mlx.storage.db import init_db
+
 init_db(mlx_dir / "mlx.db")
 os.chdir(tmp)
 
 # Start a run so metrics/params have somewhere to go
 from mlx.core.run import RunManager
+
 run = RunManager.start("catboost-v1", experiment="fraud-detection")
 print(f"\n── Run started: {run.run_id} ──\n")
 
@@ -40,7 +45,7 @@ ParamManager.log("optimizer",  "adam")   # string value
 
 # Log a duplicate — should UPDATE not create new row
 ParamManager.log("learning_rate", 0.01)
-print(f"✓ Updated param   : learning_rate → 0.01 (was 0.05)")
+print("✓ Updated param   : learning_rate → 0.01 (was 0.05)")
 
 # Get all params
 params = ParamManager.get_for_run(run.run_id)
@@ -68,19 +73,19 @@ print("\n── MetricManager ──\n")
 MetricManager.log("accuracy", 0.81, step=100)
 MetricManager.log("accuracy", 0.88, step=200)
 MetricManager.log("accuracy", 0.94, step=300)
-print(f"✓ Logged accuracy at 3 steps")
+print("✓ Logged accuracy at 3 steps")
 
 MetricManager.log("loss", 0.42, step=100)
 MetricManager.log("loss", 0.31, step=200)
 MetricManager.log("loss", 0.21, step=300)
-print(f"✓ Logged loss at 3 steps")
+print("✓ Logged loss at 3 steps")
 
 # Log many at once
 MetricManager.log_many({
     "auc":      0.97,
     "f1_score": 0.93,
 }, step=300)
-print(f"✓ Logged auc and f1_score via log_many")
+print("✓ Logged auc and f1_score via log_many")
 
 # Get all metrics — should be 8 rows total
 all_metrics = MetricManager.get_for_run(run.run_id)
@@ -103,7 +108,7 @@ keys = MetricManager.get_keys(run.run_id)
 print(f"\n✓ Metric keys : {keys}")
 
 # Test validation — should reject non-numbers
-print(f"\n✓ Testing bad value (should show error):")
+print("\n✓ Testing bad value (should show error):")
 try:
     MetricManager.log("accuracy", "not-a-number")
 except ValueError as e:
@@ -122,14 +127,14 @@ RunManager.stop()
 
 # Compare params
 param_compare = ParamManager.compare([run.run_id, run2.run_id])
-print(f"✓ Param compare:")
+print("✓ Param compare:")
 for rid, params in param_compare.items():
     name = rid.split("_")[0]
     print(f"   {name:15} → lr={params.get('learning_rate')}  depth={params.get('depth')}")
 
 # Compare metrics
 metric_compare = MetricManager.compare([run.run_id, run2.run_id])
-print(f"\n✓ Metric compare:")
+print("\n✓ Metric compare:")
 for rid, metrics in metric_compare.items():
     name = rid.split("_")[0]
     print(f"   {name:15} → accuracy={metrics.get('accuracy')}  loss={metrics.get('loss')}")

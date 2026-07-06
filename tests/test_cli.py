@@ -3,8 +3,8 @@ Tests for CLI commands using Typer's CliRunner.
 Tests the full command pipeline end to end.
 """
 
-import pytest
 from typer.testing import CliRunner
+
 from mlx.cli import app
 
 runner = CliRunner()

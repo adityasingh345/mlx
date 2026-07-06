@@ -3,7 +3,9 @@
 # every run belongs to one experiment 
 
 from sqlmodel import select
-from mlx.storage.db import get_session, Experiment
+
+from mlx.storage.db import Experiment, get_session
+
 
 class ExperimentManager:
     # handles all the experiment operations

@@ -10,11 +10,11 @@ Usage:
 """
 
 import subprocess
+
 from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, roc_auc_score
-import numpy as np
+from sklearn.model_selection import cross_val_score, train_test_split
 
 
 def mlx(cmd):

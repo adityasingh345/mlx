@@ -1,6 +1,7 @@
 """Tests for RunManager."""
 
 import pytest
+
 from mlx.core.run import RunManager
 from mlx.storage.filesystem import get_active_run
 

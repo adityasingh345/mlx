@@ -8,8 +8,9 @@ Examples:
 """
 
 from sqlmodel import select
-from mlx.storage.db import get_session, Param
-from mlx.storage.filesystem import get_active_run, append_log
+
+from mlx.storage.db import Param, get_session
+from mlx.storage.filesystem import append_log, get_active_run
 
 
 class ParamManager:

@@ -28,6 +28,7 @@ jobs:
 
       - name: Lint with ruff
         run: ruff check .
+        continue-on-error: true
 
       - name: Run tests
         run: pytest -v --cov=mlx

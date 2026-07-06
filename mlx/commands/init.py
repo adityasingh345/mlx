@@ -1,13 +1,13 @@
-import typer
+from pathlib import Path
+
 import toml
-from pathlib import Path 
+import typer
 from rich.console import Console
 from rich.panel import Panel
 
-
-from mlx.storage.db import init_db
 from mlx.core.experiment import ExperimentManager
-from mlx.utils.display import success, error, info, warn 
+from mlx.storage.db import init_db
+from mlx.utils.display import info, warn
 
 app = typer.Typer(help="Initialize a new mlx project.")
 console = Console()
@@ -137,8 +137,8 @@ def init(
                     f"[dim]{cwd}[/dim]"
                 )
                 console.print(
-                    f"  Go to your project root or use "
-                    f"[bold cyan]--force[/bold cyan] to create a nested project."
+                    "  Go to your project root or use "
+                    "[bold cyan]--force[/bold cyan] to create a nested project."
                 )
                 raise typer.Exit()
     

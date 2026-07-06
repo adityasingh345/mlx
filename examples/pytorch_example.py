@@ -12,13 +12,13 @@ Usage:
 """
 
 import subprocess
+
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader, TensorDataset
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-import numpy as np
+from torch.utils.data import DataLoader, TensorDataset
 
 
 def mlx(cmd):
@@ -57,9 +57,9 @@ criterion  = nn.BCELoss()
 # ── Log params ────────────────────────────────
 mlx(f"log param learning_rate {lr}")
 mlx(f"log param epochs        {epochs}")
-mlx(f"log param batch_size    64")
-mlx(f"log param optimizer     adam")
-mlx(f"log param architecture  MLP-64-32-1")
+mlx("log param batch_size    64")
+mlx("log param optimizer     adam")
+mlx("log param architecture  MLP-64-32-1")
 
 # ── Training loop ─────────────────────────────
 for epoch in range(1, epochs + 1):

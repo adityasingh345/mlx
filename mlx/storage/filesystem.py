@@ -8,11 +8,11 @@ Handles everything outside the database:
 - Tracking which run is currently active
 """
 
+import datetime
 from pathlib import Path
 from typing import Optional
-import datetime
-import toml
 
+import toml
 
 # ─────────────────────────────────────────────
 # CONSTANTS

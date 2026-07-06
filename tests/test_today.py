@@ -2,8 +2,11 @@
 Quick terminal test for core/experiment.py and core/run.py
 """
 
-import tempfile, os, toml
+import os
+import tempfile
 from pathlib import Path
+
+import toml
 
 # ── Step 1: Create a fake project folder ──
 tmp = Path(tempfile.mkdtemp())
@@ -17,6 +20,7 @@ with open(mlx_dir / "config.toml", "w") as f:
 
 # Create the database
 from mlx.storage.db import init_db
+
 init_db(mlx_dir / "mlx.db")
 
 # Move into the temp folder so find_root() works
@@ -34,7 +38,7 @@ print(f"  created_at : {exp.created_at}")
 
 # Try creating same experiment again — should NOT duplicate
 exp2 = ExperimentManager.create("fraud-detection")
-print(f"\n✓ Created same experiment again (should not duplicate)")
+print("\n✓ Created same experiment again (should not duplicate)")
 
 all_exps = ExperimentManager.get_all()
 print(f"  Total experiments in DB : {len(all_exps)}  (should be 1)")
@@ -54,7 +58,7 @@ run = RunManager.start(
     experiment="fraud-detection",
     tags="catboost,test"
 )
-print(f"✓ Run started")
+print("✓ Run started")
 print(f"  run_id     : {run.run_id}")
 print(f"  name       : {run.name}")
 print(f"  experiment : {run.experiment}")
@@ -66,7 +70,7 @@ active = RunManager.get_active()
 print(f"\n✓ Active run : {active.name}")
 
 # Try starting another — should raise error
-print(f"\n✓ Trying to start second run (should show error):")
+print("\n✓ Trying to start second run (should show error):")
 try:
     RunManager.start("xgboost-v1")
 except RuntimeError as e:
@@ -82,7 +86,7 @@ print(f"✓ Total runs in DB  : {len(all_runs)}")
 
 # Stop the run
 stopped = RunManager.stop(status="done")
-print(f"\n✓ Run stopped")
+print("\n✓ Run stopped")
 print(f"  status       : {stopped.status}")
 print(f"  duration_sec : {stopped.duration_sec}s")
 print(f"  finished_at  : {stopped.finished_at[:19]}")

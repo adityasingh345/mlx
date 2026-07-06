@@ -1,10 +1,18 @@
 # the most important file, manages the start -> running -> stop 
 # every run has unique id, a status runnning, done or failed , params and metrics atteched to it , and a log file for everything 
 
-from sqlmodel import select
 import datetime
+
+from sqlmodel import select
+
 from mlx.storage.db import Run, get_session
-from mlx.storage.filesystem import (save_active_run,clear_active_run, get_active_run, append_log)
+from mlx.storage.filesystem import (
+    append_log,
+    clear_active_run,
+    get_active_run,
+    save_active_run,
+)
+
 
 class RunManager:
     
